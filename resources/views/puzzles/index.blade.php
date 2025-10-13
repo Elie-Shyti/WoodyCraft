@@ -55,6 +55,15 @@
                                     </button>
                                 </form>
                             </td>
+                            {{-- Ajout au Panier --}}
+                            <td class="px-2 py-2">
+                            <form action="{{ route('cart.add', $puzzle) }}" method="POST" class="inline-flex items-center space-x-2">
+                            @csrf
+                            <input type="number" name="qty" value="1" min="1" class="w-16 border rounded px-2 py-1">
+                            <x-primary-button>Ajouter au panier</x-primary-button>
+                            
+                             </form>
+                        </td>
                         </tr>
                     @empty
                         <tr>

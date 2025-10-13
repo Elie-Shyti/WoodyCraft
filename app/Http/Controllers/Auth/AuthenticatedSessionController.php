@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Illuminate\Support\Str; 
 
 class AuthenticatedSessionController extends Controller
 {
@@ -35,14 +36,29 @@ class AuthenticatedSessionController extends Controller
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request): \Illuminate\Http\RedirectResponse
     {
-        Auth::guard('web')->logout();
+        // URL précédente (HTTP Referer)
+        $previous = url()->previous();
+        $current  = url()->current(); // l’URL de /logout
+        $fallback = route('home');    // ex: '/'
+    
+        // Pages qui nécessitent d'être connecté
+        $protectedPrefixes = ['/panier', '/checkout', '/dashboard', '/profile'];
+    
+        // Choix de la destination après logout
+        $to = $fallback;
+        if ($previous && $previous !== $current) {
+            $path = parse_url($previous, PHP_URL_PATH) ?? '/';
+            $isProtected = Str::startsWith($path, $protectedPrefixes);
+            $to = $isProtected ? $fallback : $previous;
+        }
 
-        $request->session()->invalidate();
+    // Déconnexion
+    Auth::guard('web')->logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
 
-        $request->session()->regenerateToken();
-
-        return redirect('/');
-    }
+    return redirect()->to($to);
+}
 }

@@ -2,20 +2,21 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+
+// Import des modèles liés
+use App\Models\Adresse;
+use App\Models\Panier;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
+     * Les attributs pouvant être remplis en masse.
      */
     protected $fillable = [
         'name',
@@ -24,9 +25,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
+     * Les attributs cachés pour la sérialisation.
      */
     protected $hidden = [
         'password',
@@ -34,12 +33,49 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
+     * Les attributs à caster.
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /* =======================
+     |  Relations Adresses
+     |======================= */
+
+    // Toutes les adresses de l'utilisateur
+    public function adresses()
+    {
+        return $this->hasMany(Adresse::class, 'id_utilisateur', 'id');
+    }
+
+    // Dernière adresse modifiée (utile pour le préremplissage)
+    public function derniereAdresse()
+    {
+        return $this->hasOne(Adresse::class, 'id_utilisateur', 'id')
+                    ->latestOfMany('updated_at');
+    }
+
+    /* =======================
+     |  Relations Paniers
+     |======================= */
+
+    public function paniers()
+    {
+        return $this->hasMany(Panier::class, 'id_utilisateur', 'id');
+    }
+
+    /* =======================
+     |  Méthodes métiers
+     |======================= */
+
+    // Vérifie si l'utilisateur a déjà acheté un puzzle donné
+    public function hasPurchasedPuzzle($puzzleId)
+    {
+        return $this->paniers()
+            ->where('status', '!=', 'open') // uniquement paniers finalisés
+            ->whereHas('puzzles', fn($q) => $q->where('puzzles.id', $puzzleId))
+            ->exists();
+    }
 }

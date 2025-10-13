@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Puzzle extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'nom',
         'categorie',
@@ -15,4 +16,12 @@ class Puzzle extends Model
         'prix',
         'image',
     ];
+
+    /**
+     * Relation : un puzzle peut avoir plusieurs avis
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'puzzles_id');
+    }
 }

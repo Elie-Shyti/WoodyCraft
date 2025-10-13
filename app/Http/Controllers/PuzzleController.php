@@ -101,11 +101,6 @@ class PuzzleController extends Controller
      */
     public function destroy(Puzzle $puzzle)
     {
-        $puzzle->delete();
-        
-
-        return redirect()
-        ->route('puzzles.index')
-        ->with('message', 'Le puzzle a bien été supprimé.');
+        return $this->remove($request, $puzzleId);
     }
 }

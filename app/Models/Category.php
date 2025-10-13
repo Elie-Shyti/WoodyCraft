@@ -9,6 +9,10 @@ class Category extends Model
 {
     use HasFactory;
 
-    // Définit les champs autorisés à être remplis
-    protected $fillable = ['name'];
+    protected $fillable = ['nom']; // <-- PAS 'name'
+
+    public function puzzles()
+    {
+        return $this->hasMany(Puzzle::class, 'category_id');
+    }
 }
