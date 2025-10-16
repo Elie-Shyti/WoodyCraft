@@ -30,7 +30,6 @@ WoodyCraft vend des puzzles 3D. L’objectif de l’application est d’offrir u
 * Page d’accueil listant les **catégories**
 * Pages listant les **puzzles** d’une catégorie
 * **Fiche produit**
-* **Panier** (ajout, modification quantité, suppression)
 * **Authentification** (requise pour commander)
 * **Passage de commande** avec saisie d’**adresse de livraison**
 * **Paiement** au choix : **chèque (avec facture PDF)** ou **redirection PayPal**
@@ -50,16 +49,15 @@ WoodyCraft vend des puzzles 3D. L’objectif de l’application est d’offrir u
 
   * **Chèque** → **facture PDF** générée (détails + total + adresse d’envoi du chèque)
   * **PayPal** → redirection vers la page officielle
-
-> Des idées d’extensions : paiement CB, multilingue, administration, produits similaires, ajout au panier depuis la liste, etc.
+  * **Carte** 
+> Des idées d’extensions : multilingue, administration, produits similaires, etc.
 
 ## Stack technique
 
 * **PHP** >= 8.x
 * **Laravel** 10/11 (artisan, migrations, seeders)
-* **MySQL/MariaDB** (ou PostgreSQL)
+* **MySQL/MariaDB** laragon
 * **Blade** / **Tailwind CSS** (ou un framework CSS de votre choix)
-* **Composer** & **Node.js** (Vite) pour l’outillage
 
 ## Prérequis
 
@@ -102,8 +100,6 @@ npm run build   # ou: npm run dev
 php artisan serve
 ```
 
-Par défaut, l’application sera disponible sur **[http://127.0.0.1:8000](http://127.0.0.1:8000)**.
-
 ## Configuration de l’environnement
 
 Dans le fichier `.env` :
@@ -136,7 +132,6 @@ INVOICE_OUTPUT_PATH=invoices
 ## Base de données & seeders
 
 * Modélisez les **catégories**, **puzzles**, **paniers**, **relations N:N**, **commandes**, **adresses**, **lignes de commande**, **utilisateurs**.
-* Fournissez des **Seeders** minimaux (catégories, puzzles de démo) pour tester rapidement.
 
 ```bash
 php artisan migrate --seed
@@ -206,7 +201,6 @@ Lors du choix **Paiement par chèque** :
 
 ## Roadmap / US supplémentaires
 
-* Paiement **carte bancaire** (ex : Stripe)
 * **Multilingue** (ex : FR/EN avec Laravel Localization)
 * **Administration** (CRUD catégories/puzzles, gestion commandes)
 * **Produits similaires** sur la fiche produit
@@ -214,5 +208,5 @@ Lors du choix **Paiement par chèque** :
 
 ## Licence
 
-Projet éducatif – BTS SIO SLAM. Si vous souhaitez une licence spécifique (MIT/Apache2), ajoutez le fichier `LICENSE` et mettez à jour cette section.
+Projet éducatif – BTS SIO SLAM 
 
