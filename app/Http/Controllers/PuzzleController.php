@@ -60,7 +60,27 @@ class PuzzleController extends Controller
      */
     public function show(Puzzle $puzzle)
     {
-        return view('puzzles.show', compact('puzzle'));
+        // 1) Si tu stockes une URL complète dans la BDD
+        if (!empty($puzzle->image_url)) {
+            $image = $puzzle->image_url;
+        }
+        // 2) Si tu stockes un chemin relatif et que tu veux utiliser public/ (ex: "images/produit.png")
+        elseif (!empty($puzzle->image_path) && file_exists(public_path($puzzle->image_path))) {
+            $image = asset($puzzle->image_path);
+        }
+        // 3) Si tu as stocké dans storage/app/public -> Storage::url (nécessite storage:link)
+        elseif (!empty($puzzle->image_path) && Storage::disk('public')->exists($puzzle->image_path)) {
+            $image = Storage::url($puzzle->image_path); // ex: /storage/products/xxx.jpg
+        }
+        // 4) Fallback vers public/images/produit.png
+        elseif (file_exists(public_path('images/produit.png'))) {
+            $image = asset('images/produit.png');
+        } else {
+            // dernier recours (dev)
+            $image = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=='; // 1px transparent
+        }
+    
+        return view('puzzles.show', compact('puzzle', 'image'));
     }
 
     /**

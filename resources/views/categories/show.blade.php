@@ -11,13 +11,24 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     @foreach ($puzzles as $puzzle)
                         @php
-                            // Image du puzzle (adapte aux champs de ton modèle)
-                            $img = $puzzle->image_url
-                                ?? (isset($puzzle->image_path) ? Storage::url($puzzle->image_path) : null);
+                            // Résolution d'image robuste :
+                            // priorité : image_url > public_path(image_path) > storage/app/public(image_path) > fallback public/images/produit.png
+                            $img = null;
 
-                            // On rend les items 5 et 6 "larges" pour coller à la maquette
+                            if (!empty($puzzle->image_url)) {
+                                $img = $puzzle->image_url;
+                            } elseif (!empty($puzzle->image_path) && file_exists(public_path($puzzle->image_path))) {
+                                $img = asset($puzzle->image_path);
+                            } elseif (!empty($puzzle->image_path) && \Illuminate\Support\Facades\Storage::disk('public')->exists($puzzle->image_path)) {
+                                $img = \Illuminate\Support\Facades\Storage::url($puzzle->image_path);
+                            } else {
+                                $img = asset('images/produit.png');
+                            }
+
                             $isWide = $loop->iteration > 4 && $loop->iteration <= 6;
                             $price = $puzzle->prix ?? $puzzle->price ?? 0;
+                            // Format euro string (ex: "20,00 €")
+                            $priceEuro = number_format($price, 2, ',', ' ') . ' €';
                         @endphp
 
                         <a href="{{ route('puzzles.show', $puzzle) }}"
@@ -27,38 +38,54 @@
                                 <div class="flex flex-col sm:flex-row">
                                     <div class="sm:w-1/2">
                                         @if($img)
-                                            <img src="{{ $img }}" alt="{{ $puzzle->nom ?? $puzzle->name }}"
+                                            <img src="{{ $img }}"
+                                                 alt="{{ $puzzle->nom ?? $puzzle->name }}"
+                                                 loading="lazy"
+                                                 onerror="this.onerror=null;this.src='{{ asset('images/produit.png') }}';"
                                                  class="w-full h-56 object-cover rounded-t-xl sm:rounded-tr-none sm:rounded-l-xl">
                                         @else
                                             <div class="w-full h-56 bg-gray-100 rounded-t-xl sm:rounded-tr-none sm:rounded-l-xl grid place-items-center text-gray-400 text-xs">No image</div>
                                         @endif
                                     </div>
+
                                     <div class="p-4 sm:w-1/2">
                                         <h3 class="text-sm font-semibold text-gray-900 truncate">
-                                            {{ $puzzle->nom ?? $puzzle->name ?? 'Text' }}
+                                            {{ $puzzle->nom ?? $puzzle->name ?? 'Produit' }}
                                         </h3>
+
                                         <div class="mt-2 text-xs text-gray-500 line-clamp-2">
-                                            {{ \Illuminate\Support\Str::limit($puzzle->description ?? 'Text', 90) }}
+                                            {{ \Illuminate\Support\Str::limit($puzzle->description ?? '—', 90) }}
                                         </div>
-                                        <div class="mt-3 font-semibold text-gray-900">${{ number_format($price, 0, '.', ' ') }}</div>
+
+                                        <div class="mt-3 font-semibold text-gray-900">
+                                            {{ $priceEuro }}
+                                        </div>
                                     </div>
                                 </div>
                             @else
                                 {{-- Petite carte (portrait) --}}
                                 <div>
                                     @if($img)
-                                        <img src="{{ $img }}" alt="{{ $puzzle->nom ?? $puzzle->name }}"
+                                        <img src="{{ $img }}"
+                                             alt="{{ $puzzle->nom ?? $puzzle->name }}"
+                                             loading="lazy"
+                                             onerror="this.onerror=null;this.src='{{ asset('images/produit.png') }}';"
                                              class="w-full h-48 object-cover rounded-t-xl">
                                     @else
                                         <div class="w-full h-48 bg-gray-100 rounded-t-xl grid place-items-center text-gray-400 text-xs">No image</div>
                                     @endif
                                 </div>
+
                                 <div class="p-3">
                                     <h3 class="text-sm font-semibold text-gray-900 truncate">
-                                        {{ $puzzle->nom ?? $puzzle->name ?? 'Text' }}
+                                        {{ $puzzle->nom ?? $puzzle->name ?? 'Produit' }}
                                     </h3>
-                                    <div class="mt-1 text-xs text-gray-500">Text</div>
-                                    <div class="mt-2 font-semibold text-gray-900">${{ number_format($price, 0, '.', ' ') }}</div>
+
+                                    <div class="mt-1 text-xs text-gray-500">—</div>
+
+                                    <div class="mt-2 font-semibold text-gray-900">
+                                        {{ $priceEuro }}
+                                    </div>
                                 </div>
                             @endif
                         </a>

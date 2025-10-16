@@ -23,15 +23,7 @@
                             {{ __('Voir les catégories') }}
                         </x-nav-link>
 
-                        <x-nav-link :href="route('puzzles.index')" :active="request()->routeIs('puzzles.index')">
-                            {{ __('Puzzles') }}
-                        </x-nav-link>
-
                         @auth
-                            {{-- Si la création est réservée aux connectés --}}
-                            <x-nav-link :href="route('puzzles.create')" :active="request()->routeIs('puzzles.create')">
-                                {{ __('Créer un puzzle') }}
-                            </x-nav-link>
                         @endauth
                     </div>
                 </div>

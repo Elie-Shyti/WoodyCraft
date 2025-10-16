@@ -24,4 +24,11 @@ class Puzzle extends Model
     {
         return $this->hasMany(Review::class, 'puzzles_id');
     }
+
+    public function paniers()
+    {
+        return $this->belongsToMany(Panier::class, 'appartient', 'id_Puzzle', 'id_Panier')
+        ->withPivot('quantite', 'prix');
+    }
+
 }
