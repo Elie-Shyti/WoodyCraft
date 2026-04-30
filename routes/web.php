@@ -8,6 +8,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutAddressController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\FournisseurController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,7 @@ Route::get('/', [CategoryController::class, 'index'])->name('home');
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
 Route::resource('puzzles', PuzzleController::class)->only(['index','show']);
+Route::resource('fournisseurs', FournisseurController::class)->only(['index','create','store','edit','update','destroy']);
 
 Route::get('/dashboard', fn () => view('dashboard'))
     ->middleware(['auth','verified'])

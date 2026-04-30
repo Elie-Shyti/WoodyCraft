@@ -100,7 +100,7 @@ class PaymentController extends Controller
     
         $panier = Panier::where('id_utilisateur', $user->id)
             ->latest('id')
-            ->with(['puzzles' => fn($q) => $q->withPivot(['quantite','prix'])])
+            ->with(['puzzles' => fn($q) => $q->withPivot(['quantite','prix'])->with('fournisseur')])
             ->first();
 
         // 🟢 On vérifie et on marque bien comme "completed"
@@ -112,6 +112,7 @@ class PaymentController extends Controller
         $lines = $panier
             ? $panier->puzzles->map(fn($p) => [
                 'name'       => $p->nom ?? $p->name ?? 'Puzzle',
+                'supplier'   => $p->fournisseur->nom ?? '—',
                 'quantity'   => (int)($p->pivot->quantite ?? 1),
                 'unit_price' => (float)($p->pivot->prix ?? $p->prix ?? 0),
                 'line_total' => (int)($p->pivot->quantite ?? 1) * (float)($p->pivot->prix ?? $p->prix ?? 0),

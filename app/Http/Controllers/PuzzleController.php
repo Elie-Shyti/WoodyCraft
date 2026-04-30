@@ -5,122 +5,99 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Puzzle;
 use App\Models\Category;
+use App\Models\Fournisseur;
 
 
 class PuzzleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        $puzzles = Puzzle::all();
-        return view('puzzles.index', compact('puzzles'));
+        $fournisseurs = Fournisseur::orderBy('nom')->get();
 
-        $categories = Category::all();
-        return view('categories', compact('categories'));
+        $query = Puzzle::with('fournisseur');
+
+        if ($request->filled('fournisseur_id')) {
+            $query->where('fournisseur_id', $request->fournisseur_id);
+        }
+
+        $puzzles = $query->get();
+
+        return view('puzzles.index', compact('puzzles', 'fournisseurs'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-    $categories = Category::all();  
-    
-    return view('puzzles.create', compact('categories'));
+        $categories = Category::all();
+        $fournisseurs = Fournisseur::orderBy('nom')->get();
+
+        return view('puzzles.create', compact('categories', 'fournisseurs'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        $date = $request->validate([
-        'nom'         => 'required|max:100',
-        'categorie'   => 'required|max:100',
-        'category_id'=> 'required|max:100',
-        'description' => 'required|max:500',
-        'image'       => 'required|max:500',
-        'prix'        => 'required|numeric|between:0,99.99',]);
+        $data = $request->validate([
+            'nom'            => 'required|max:100',
+            'categorie'      => 'required|max:100',
+            'category_id'    => 'required|exists:categories,id',
+            'fournisseur_id' => 'nullable|exists:fournisseurs,id',
+            'description'    => 'required|max:500',
+            'image'          => 'required|max:500',
+            'prix'           => 'required|numeric|between:0,9999.99',
+        ]);
 
-        $puzzle = new Puzzle();
-        $puzzle->nom = $request->nom;
-        $puzzle->categorie = $request->categorie;
-        $puzzle->category_id = $request->category_id;
-        $puzzle->description = $request->description;
-        $puzzle->image = $request->image;
-        $puzzle->prix = $request->prix;
-        $puzzle->save();
-        return back()->with('message', "Le puzzle a bien été créé !");
+        Puzzle::create($data);
+
+        return back()->with('message', 'Le puzzle a bien été créé !');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Puzzle $puzzle)
     {
-        // 1) Si tu stockes une URL complète dans la BDD
+        $puzzle->load('fournisseur');
+
         if (!empty($puzzle->image_url)) {
             $image = $puzzle->image_url;
-        }
-        // 2) Si tu stockes un chemin relatif et que tu veux utiliser public/ (ex: "images/produit.png")
-        elseif (!empty($puzzle->image_path) && file_exists(public_path($puzzle->image_path))) {
+        } elseif (!empty($puzzle->image_path) && file_exists(public_path($puzzle->image_path))) {
             $image = asset($puzzle->image_path);
-        }
-        // 3) Si tu as stocké dans storage/app/public -> Storage::url (nécessite storage:link)
-        elseif (!empty($puzzle->image_path) && Storage::disk('public')->exists($puzzle->image_path)) {
-            $image = Storage::url($puzzle->image_path); // ex: /storage/products/xxx.jpg
-        }
-        // 4) Fallback vers public/images/produit.png
-        elseif (file_exists(public_path('images/produit.png'))) {
+        } elseif (!empty($puzzle->image_path) && \Illuminate\Support\Facades\Storage::disk('public')->exists($puzzle->image_path)) {
+            $image = \Illuminate\Support\Facades\Storage::url($puzzle->image_path);
+        } elseif (file_exists(public_path('images/produit.png'))) {
             $image = asset('images/produit.png');
         } else {
-            // dernier recours (dev)
-            $image = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=='; // 1px transparent
+            $image = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
         }
-    
+
         return view('puzzles.show', compact('puzzle', 'image'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Puzzle $puzzle)
     {
-        return view('puzzles.edit', compact('puzzle'));
+        $categories = Category::all();
+        $fournisseurs = Fournisseur::orderBy('nom')->get();
+
+        return view('puzzles.edit', compact('puzzle', 'categories', 'fournisseurs'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Puzzle $puzzle)
     {
         $data = $request->validate([
-            'nom'         => 'required|max:100',
-            'categorie'   => 'required|max:100',
-            'description' => 'required|max:500',
-            'image'       => 'required|max:500',
-            'prix'        => 'required|numeric|between:0,99.99',]);
-            
-            $puzzle->nom=$request->nom;
-            $puzzle->categorie=$request->categorie;
-            $puzzle->description=$request->description;
-            $puzzle->image=$request->image;
-            $puzzle->prix=$request->prix;
+            'nom'            => 'required|max:100',
+            'categorie'      => 'required|max:100',
+            'fournisseur_id' => 'nullable|exists:fournisseurs,id',
+            'description'    => 'required|max:500',
+            'image'          => 'required|max:500',
+            'prix'           => 'required|numeric|between:0,9999.99',
+        ]);
 
-            $puzzle->update($data);
+        $puzzle->update($data);
 
-            return redirect()
+        return redirect()
             ->route('puzzles.edit', $puzzle)
             ->with('message', 'Puzzle mis à jour !');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Puzzle $puzzle)
     {
-        return $this->remove($request, $puzzleId);
+        $puzzle->delete();
+        return redirect()->route('puzzles.index')->with('message', 'Puzzle supprimé.');
     }
 }

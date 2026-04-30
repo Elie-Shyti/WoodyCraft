@@ -6,7 +6,6 @@
     </x-slot>
 
     <x-puzzles-card>
-        <!-- Message de réussite -->
         @if (session()->has('message'))
             <div class="mt-3 mb-4 list-disc list-inside text-sm text-green-600">
                 {{ session('message') }}
@@ -20,57 +19,79 @@
             <div>
                 <x-input-label for="nom" :value="__('Nom')" />
                 <x-text-input id="nom" class="block mt-1 w-full"
-                              type="text"
-                              name="nom"
-                              :value="old('nom')"
+                              type="text" name="nom" :value="old('nom')"
                               required autofocus />
                 <x-input-error :messages="$errors->get('nom')" class="mt-2" />
-                
-                <x-input-label for="categorie" :value="__('Catégorie')" />
-                <x-text-input id="categorie" class="block mt-1 w-full"
-                            type="text" name="categorie" :value="old('categorie')"
-                            required />
-                <x-input-error :messages="$errors->get('categorie')" class="mt-2" />
+            </div>
 
+            <!-- Catégorie texte -->
+            <div class="mt-4">
+                <x-input-label for="categorie" :value="__('Catégorie (texte)')" />
+                <x-text-input id="categorie" class="block mt-1 w-full"
+                              type="text" name="categorie" :value="old('categorie')"
+                              required />
+                <x-input-error :messages="$errors->get('categorie')" class="mt-2" />
+            </div>
+
+            <!-- Catégorie ID -->
+            <div class="mt-4">
                 <x-input-label for="category_id" :value="__('Catégorie')" />
-                <select id="category_id" name="category_id" class="block mt-1 w-full" required>
-                <option value="" disabled selected>{{ __('Choisir une catégorie') }}</option>
-                @foreach ($categories as $category)
-                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                {{ $category->nom }}
-                </option>
-                @endforeach
+                <select id="category_id" name="category_id"
+                        class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" required>
+                    <option value="" disabled selected>{{ __('Choisir une catégorie') }}</option>
+                    @foreach ($categories as $category)
+                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                            {{ $category->nom }}
+                        </option>
+                    @endforeach
                 </select>
                 <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
+            </div>
 
+            <!-- Fournisseur -->
+            <div class="mt-4">
+                <x-input-label for="fournisseur_id" :value="__('Fournisseur')" />
+                <select id="fournisseur_id" name="fournisseur_id"
+                        class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
+                    <option value="">— Aucun fournisseur —</option>
+                    @foreach ($fournisseurs as $fournisseur)
+                        <option value="{{ $fournisseur->id }}" {{ old('fournisseur_id') == $fournisseur->id ? 'selected' : '' }}>
+                            {{ $fournisseur->nom }}
+                        </option>
+                    @endforeach
+                </select>
+                <x-input-error :messages="$errors->get('fournisseur_id')" class="mt-2" />
+            </div>
 
+            <!-- Description -->
+            <div class="mt-4">
                 <x-input-label for="description" :value="__('Description')" />
-                <x-textarea id="description" name="description" rows="4"
-                    class="block mt-1 w-full"></x-textarea>
+                <textarea id="description" name="description" rows="4"
+                          class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ old('description') }}</textarea>
                 <x-input-error :messages="$errors->get('description')" class="mt-2" />
+            </div>
 
-                <div class="mt-4">
+            <!-- Image -->
+            <div class="mt-4">
                 <x-input-label for="image" :value="__('Image')" />
                 <x-text-input id="image" class="block mt-1 w-full"
-                      type="text" name="image" />
+                              type="text" name="image" :value="old('image')" />
                 <x-input-error :messages="$errors->get('image')" class="mt-2" />
-
-                <div class="mt-4">
-                <x-input-label for="prix" :value="__('Prix')" />
-                <x-text-input id="prix" class="block mt-1 w-full"
-                      type="text" name="prix" />
-                <x-input-error :messages="$errors->get('prix')" class="mt-2" />
-            
             </div>
-    </div>
+
+            <!-- Prix -->
+            <div class="mt-4">
+                <x-input-label for="prix" :value="__('Prix (€)')" />
+                <x-text-input id="prix" class="block mt-1 w-full"
+                              type="number" step="0.01" min="0" name="prix" :value="old('prix')" />
+                <x-input-error :messages="$errors->get('prix')" class="mt-2" />
             </div>
 
             <div class="flex items-center justify-end mt-4">
                 <x-primary-button class="ml-3">
-                    {{ __('Send') }}
+                    {{ __('Créer') }}
                 </x-primary-button>
             </div>
         </form>
     </x-puzzles-card>
 </x-app-layout>
-

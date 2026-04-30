@@ -31,6 +31,7 @@
     <thead>
       <tr>
         <th>Produit</th>
+        <th>Fournisseur</th>
         <th>Qté</th>
         <th>PU (€)</th>
         <th>Total ligne (€)</th>
@@ -40,17 +41,18 @@
       @forelse ($lines as $line)
         <tr>
           <td>{{ $line['name'] }}</td>
+          <td>{{ $line['supplier'] ?? '—' }}</td>
           <td>{{ $line['quantity'] }}</td>
           <td>{{ number_format($line['unit_price'], 2, ',', ' ') }}</td>
           <td>{{ number_format($line['line_total'], 2, ',', ' ') }}</td>
         </tr>
       @empty
-        <tr><td colspan="4">Aucun article.</td></tr>
+        <tr><td colspan="5">Aucun article.</td></tr>
       @endforelse
     </tbody>
     <tfoot>
       <tr>
-        <td colspan="3" style="text-align:right;">TOTAL</td>
+        <td colspan="4" style="text-align:right;">TOTAL</td>
         <td>{{ number_format($total, 2, ',', ' ') }} €</td>
       </tr>
     </tfoot>
@@ -58,8 +60,8 @@
 
   <h3>Règlement par chèque</h3>
   <p>
-    À l’ordre de : <strong>{{ $cheque_to }}</strong><br>
-    Adresse d’envoi :<br>
+    À l'ordre de : <strong>{{ $cheque_to }}</strong><br>
+    Adresse d'envoi :<br>
     {!! nl2br(e($cheque_address)) !!}
   </p>
 </body>

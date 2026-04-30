@@ -7,7 +7,6 @@
                     {{-- Image large à gauche --}}
                     <div class="lg:col-span-1">
                         <div class="w-full h-80 bg-gray-100 rounded-xl border border-gray-100 flex items-center justify-center overflow-hidden">
-                            {{-- Affiche l'image résolue --}}
                             <img src="{{ $image }}" alt="{{ $puzzle->nom ?? $puzzle->name ?? 'Produit' }}"
                                  class="w-full h-full object-cover">
                         </div>
@@ -18,6 +17,13 @@
                         <h1 class="text-2xl font-extrabold text-gray-900 mb-2">
                             {{ $puzzle->nom ?? $puzzle->name ?? 'Produit' }}
                         </h1>
+
+                        {{-- Fournisseur --}}
+                        @if($puzzle->fournisseur)
+                            <p class="text-sm text-gray-500 mb-3">
+                                Fournisseur : <span class="font-medium text-gray-700">{{ $puzzle->fournisseur->nom }}</span>
+                            </p>
+                        @endif
 
                         <div class="text-3xl font-bold text-gray-900 mb-4">
                             {{ isset($puzzle->prix) ? number_format($puzzle->prix, 2, ',', ' ') . ' €' : (isset($puzzle->price) ? number_format($puzzle->price, 2, ',', ' ') . ' €' : '—') }}
@@ -43,8 +49,6 @@
                                     class="inline-flex items-center px-5 py-2 rounded-full bg-black text-white text-sm font-semibold hover:opacity-95 transition">
                                 Ajouter au panier
                             </button>
-
-                            {{-- Optionnel : bouton pour wishlist, partage, etc. --}}
                         </form>
 
                         {{-- Message flash --}}
@@ -57,7 +61,7 @@
                 </div>
             </div>
 
-            {{-- Section avis (existant dans ta maquette) --}}
+            {{-- Section avis --}}
             <div class="mt-10">
                 <h2 class="text-xl font-semibold text-gray-900">Avis des clients</h2>
                 <p class="mt-2 text-sm text-gray-500">Aucun avis pour le moment. Soyez le premier à en laisser un !</p>

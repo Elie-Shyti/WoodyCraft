@@ -12,7 +12,6 @@
             </div>
         @endif
 
-        {{-- Affiche un résumé des erreurs si la validation échoue --}}
         @if ($errors->any())
             <div class="mb-4 text-sm text-red-600">
                 <ul class="list-disc ml-5">
@@ -35,15 +34,31 @@
                 <x-input-error :messages="$errors->get('nom')" class="mt-2" />
             </div>
 
-            {{-- Catégorie (input texte, pas textarea) --}}
+            {{-- Catégorie texte --}}
             <div class="mt-4">
-                <x-input-label for="categorie" :value="__('Catégorie')" />
+                <x-input-label for="categorie" :value="__('Catégorie (texte)')" />
                 <x-text-input id="categorie" name="categorie" type="text" class="block mt-1 w-full"
                               :value="old('categorie', $puzzle->categorie)" required />
                 <x-input-error :messages="$errors->get('categorie')" class="mt-2" />
             </div>
 
-            {{-- Description (input texte, pas textarea) --}}
+            {{-- Fournisseur --}}
+            <div class="mt-4">
+                <x-input-label for="fournisseur_id" :value="__('Fournisseur')" />
+                <select id="fournisseur_id" name="fournisseur_id"
+                        class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
+                    <option value="">— Aucun fournisseur —</option>
+                    @foreach ($fournisseurs as $fournisseur)
+                        <option value="{{ $fournisseur->id }}"
+                            {{ old('fournisseur_id', $puzzle->fournisseur_id) == $fournisseur->id ? 'selected' : '' }}>
+                            {{ $fournisseur->nom }}
+                        </option>
+                    @endforeach
+                </select>
+                <x-input-error :messages="$errors->get('fournisseur_id')" class="mt-2" />
+            </div>
+
+            {{-- Description --}}
             <div class="mt-4">
                 <x-input-label for="description" :value="__('Description')" />
                 <x-text-input id="description" name="description" type="text" class="block mt-1 w-full"
@@ -51,7 +66,7 @@
                 <x-input-error :messages="$errors->get('description')" class="mt-2" />
             </div>
 
-            {{-- image --}}
+            {{-- Image --}}
             <div class="mt-4">
                 <x-input-label for="image" :value="__('Image')" />
                 <x-text-input id="image" name="image" type="text" class="block mt-1 w-full"
@@ -61,8 +76,8 @@
 
             {{-- Prix --}}
             <div class="mt-4">
-                <x-input-label for="prix" :value="__('Prix')" />
-                <x-text-input id="prix" name="prix" type="number" step="0.01" min="0" max="99.99"
+                <x-input-label for="prix" :value="__('Prix (€)')" />
+                <x-text-input id="prix" name="prix" type="number" step="0.01" min="0"
                               class="block mt-1 w-full" :value="old('prix', $puzzle->prix)" required />
                 <x-input-error :messages="$errors->get('prix')" class="mt-2" />
             </div>

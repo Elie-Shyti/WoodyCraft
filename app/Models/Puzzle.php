@@ -12,10 +12,17 @@ class Puzzle extends Model
     protected $fillable = [
         'nom',
         'categorie',
+        'category_id',
+        'fournisseur_id',
         'description',
         'prix',
         'image',
     ];
+
+    public function fournisseur()
+    {
+        return $this->belongsTo(Fournisseur::class);
+    }
 
     /**
      * Relation : un puzzle peut avoir plusieurs avis
